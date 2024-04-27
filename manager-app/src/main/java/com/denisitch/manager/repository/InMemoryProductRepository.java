@@ -23,4 +23,14 @@ public class InMemoryProductRepository implements ProductRepository {
     public List<Product> findAll() {
         return Collections.unmodifiableList(this.products);
     }
+
+    @Override
+    public Product save(Product product) {
+        product.setId(this.products.stream()
+                .mapToInt(Product::getId)
+                .max()
+                .orElse(0) + 1);
+        this.products.add(product);
+        return product;
+    }
 }
