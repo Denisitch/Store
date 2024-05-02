@@ -21,7 +21,7 @@ public class DefaultProductService implements ProductService {
         if (filter == null || filter.isEmpty()) {
             return productRepository.findAll();
         }
-        return this.productRepository.findByTitleLikeIgnoreCase(filter);
+        return this.productRepository.findByTitleLikeIgnoreCase("%" + filter + "%");
     }
 
     @Override
