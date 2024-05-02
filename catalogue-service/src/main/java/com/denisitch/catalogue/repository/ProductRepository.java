@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface ProductRepository extends CrudRepository<Product, Integer> {
 
-    @Query(value = "select p from Product p where p.title ilike :filter")
+//    @Query(value = "select p from Product p where p.title ilike :filter")
+    @Query(value = "select * from catalogue.t_product where c_title ilike :filter", nativeQuery = true)
     Iterable<Product> findByTitleLikeIgnoreCase(@Param("filter") String filter);
 }
