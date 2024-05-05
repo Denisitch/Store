@@ -13,7 +13,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8082/realm/store
+          issuer-uri: http://localhost:8082/realms/store
 server:
   port: 8081
 logging:

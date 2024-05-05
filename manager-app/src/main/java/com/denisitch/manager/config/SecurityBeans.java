@@ -24,14 +24,14 @@ public class SecurityBeans {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
-                        authorizationManagerRequestMatcherRegistry.anyRequest().authenticated())
+                        authorizationManagerRequestMatcherRegistry.anyRequest().hasRole("MANAGER"))
                 .oauth2Login(Customizer.withDefaults())
                 .oauth2Client(Customizer.withDefaults())
                 .build();
     }
 
     @Bean
-    public OAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
+    public OAuth2UserService<OidcUserRequest, OidcUser> oAuth2UserService() {
         OidcUserService oidcUserService = new OidcUserService();
         return userRequest -> {
             OidcUser oidcUser = oidcUserService.loadUser(userRequest);
