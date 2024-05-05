@@ -2,14 +2,25 @@ store:
   services:
     catalogue:
       uri: http://localhost:8081
-      username: catalogue_service_user
-      password: password
+      registration-id: keycloak
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5433/manager
     username: manager
     password: manager
-  flyway:
-    schemas:
-      - public
-      - catalogue
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8082/realms/store
+            user-name-attribute: preferred_username
+        registration:
+         keycloak:
+           client-id: manager-app
+           client-secret: 5g5b0qlHsQLOE3BmeDa3fk4jajxhoUHp
+           scope:
+             - openid
+             - view_catalogue
+             - edit_catalogue
+             - microprofile-jwt
