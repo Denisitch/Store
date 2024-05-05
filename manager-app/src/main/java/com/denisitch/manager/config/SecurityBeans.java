@@ -26,6 +26,7 @@ public class SecurityBeans {
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry.anyRequest().authenticated())
                 .oauth2Login(Customizer.withDefaults())
+                .oauth2Client(Customizer.withDefaults())
                 .build();
     }
 

@@ -2,6 +2,7 @@ store:
   services:
     catalogue:
       uri: http://localhost:8081
+      registration-id: keycloak
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5433/manager
