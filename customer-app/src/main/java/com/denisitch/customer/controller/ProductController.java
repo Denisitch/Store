@@ -5,9 +5,12 @@ import com.denisitch.customer.entity.Product;
 import com.denisitch.customer.payload.NewProductReviewPayload;
 import com.denisitch.customer.service.FavouriteProductsService;
 import com.denisitch.customer.service.ProductReviewsService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -36,7 +39,7 @@ public class ProductController {
         return this.productReviewsService.findProductReviewsByProduct(id)
                 .collectList()
                 .doOnNext(productReviews -> model.addAttribute("reviews", productReviews))
-                .then(this.favouriteProductsService.findFavouriteProductById(id)
+                .then(this.favouriteProductsService.findFavouriteProductByProduct(id)
                         .doOnNext(_ -> model.addAttribute("inFavourite", true)))
                 .thenReturn("customer/products/product");
     }
@@ -60,9 +63,22 @@ public class ProductController {
     @PostMapping("create-review")
     public Mono<String> createReview(
             @PathVariable("productId") int id,
-            NewProductReviewPayload payload
+            @Valid NewProductReviewPayload payload,
+            BindingResult bindingResult,
+            Model model
     ) {
-        return this.productReviewsService.createProductReview(id, payload.rating(), payload.review())
-                .thenReturn("redirect:/customer/products/%d".formatted(id));
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("inFavourite", false);
+            model.addAttribute("payload", payload);
+            model.addAttribute("errors", bindingResult.getAllErrors().stream()
+                    .map(ObjectError::getDefaultMessage)
+                    .toList());
+            return this.favouriteProductsService.findFavouriteProductByProduct(id)
+                    .doOnNext(_ -> model.addAttribute("inFavourite", true))
+                    .thenReturn("customer/products/product");
+        } else {
+            return this.productReviewsService.createProductReview(id, payload.rating(), payload.review())
+                    .thenReturn("redirect:/customer/products/%d".formatted(id));
+        }
     }
 }
