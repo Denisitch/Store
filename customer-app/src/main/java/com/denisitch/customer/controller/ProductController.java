@@ -1,11 +1,10 @@
 package com.denisitch.customer.controller;
 
+import com.denisitch.customer.client.FavouriteProductsClient;
+import com.denisitch.customer.client.ProductReviewsClient;
 import com.denisitch.customer.client.ProductsClient;
 import com.denisitch.customer.entity.Product;
 import com.denisitch.customer.controller.payload.NewProductReviewPayload;
-import com.denisitch.customer.service.FavouriteProductsService;
-import com.denisitch.customer.service.ProductReviewsService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,9 +22,9 @@ public class ProductController {
 
     private final ProductsClient productsClient;
 
-    private final FavouriteProductsService favouriteProductsService;
+    private final FavouriteProductsClient favouriteProductsClient;
 
-    private final ProductReviewsService productReviewsService;
+    private final ProductReviewsClient productReviewsClient;
 
     @ModelAttribute(name = "product", binding = false)
     public Mono<Product> loadProduct(@PathVariable("productId") int productId) {
@@ -39,10 +38,10 @@ public class ProductController {
             Model model
     ) {
         model.addAttribute("inFavourite", false);
-        return this.productReviewsService.findProductReviewsByProduct(id)
+        return this.productReviewsClient.findProductReviewsByProductId(id)
                 .collectList()
                 .doOnNext(productReviews -> model.addAttribute("reviews", productReviews))
-                .then(this.favouriteProductsService.findFavouriteProductByProduct(id)
+                .then(this.favouriteProductsClient.findFavouriteProductByProductId(id)
                         .doOnNext(_ -> model.addAttribute("inFavourite", true)))
                 .thenReturn("customer/products/product");
     }
@@ -51,7 +50,7 @@ public class ProductController {
     public Mono<String> addProductToFavourites(@ModelAttribute("product") Mono<Product> productMono) {
         return productMono
                 .map(Product::id)
-                .flatMap(productId -> this.favouriteProductsService.addProductToFavourites(productId)
+                .flatMap(productId -> this.favouriteProductsClient.addProductToFavourites(productId)
                         .thenReturn("redirect:/customer/products/%d".formatted(productId)));
     }
 
@@ -59,14 +58,14 @@ public class ProductController {
     public Mono<String> removeProductFromFavourites(@ModelAttribute("product") Mono<Product> productMono) {
         return productMono
                 .map(Product::id)
-                .flatMap(productId -> this.favouriteProductsService.removeProductFromFavourites(productId)
+                .flatMap(productId -> this.favouriteProductsClient.removeProductFromFavourites(productId)
                         .thenReturn("redirect:/customer/products/%d".formatted(productId)));
     }
 
     @PostMapping("create-review")
     public Mono<String> createReview(
             @PathVariable("productId") int id,
-            @Valid NewProductReviewPayload payload,
+            NewProductReviewPayload payload,
             BindingResult bindingResult,
             Model model
     ) {
@@ -76,11 +75,11 @@ public class ProductController {
             model.addAttribute("errors", bindingResult.getAllErrors().stream()
                     .map(ObjectError::getDefaultMessage)
                     .toList());
-            return this.favouriteProductsService.findFavouriteProductByProduct(id)
+            return this.favouriteProductsClient.findFavouriteProductByProductId(id)
                     .doOnNext(_ -> model.addAttribute("inFavourite", true))
                     .thenReturn("customer/products/product");
         } else {
-            return this.productReviewsService.createProductReview(id, payload.rating(), payload.review())
+            return this.productReviewsClient.createProductReview(id, payload.rating(), payload.review())
                     .thenReturn("redirect:/customer/products/%d".formatted(id));
         }
     }
