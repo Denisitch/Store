@@ -2,7 +2,9 @@ package com.denisitch.customer.controller;
 
 import com.denisitch.customer.client.ProductsClient;
 import com.denisitch.customer.entity.Product;
+import com.denisitch.customer.payload.NewProductReviewPayload;
 import com.denisitch.customer.service.FavouriteProductsService;
+import com.denisitch.customer.service.ProductReviewsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +20,8 @@ public class ProductController {
 
     private final FavouriteProductsService favouriteProductsService;
 
+    private final ProductReviewsService productReviewsService;
+
     @ModelAttribute(name = "product", binding = false)
     public Mono<Product> loadProduct(@PathVariable("productId") int productId) {
         return this.productsClient.findProduct(productId);
@@ -29,8 +33,11 @@ public class ProductController {
             Model model
     ) {
         model.addAttribute("inFavourite", false);
-        return this.favouriteProductsService.findFavouriteProductById(id)
-                .doOnNext(_ -> model.addAttribute("inFavourite", true))
+        return this.productReviewsService.findProductReviewsByProduct(id)
+                .collectList()
+                .doOnNext(productReviews -> model.addAttribute("reviews", productReviews))
+                .then(this.favouriteProductsService.findFavouriteProductById(id)
+                        .doOnNext(_ -> model.addAttribute("inFavourite", true)))
                 .thenReturn("customer/products/product");
     }
 
@@ -48,5 +55,14 @@ public class ProductController {
                 .map(Product::id)
                 .flatMap(productId -> this.favouriteProductsService.removeProductFromFavourites(productId)
                         .thenReturn("redirect:/customer/products/%d".formatted(productId)));
+    }
+
+    @PostMapping("create-review")
+    public Mono<String> createReview(
+            @PathVariable("productId") int id,
+            NewProductReviewPayload payload
+    ) {
+        return this.productReviewsService.createProductReview(id, payload.rating(), payload.review())
+                .thenReturn("redirect:/customer/products/%d".formatted(id));
     }
 }
