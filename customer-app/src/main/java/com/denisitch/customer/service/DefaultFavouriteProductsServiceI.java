@@ -4,6 +4,7 @@ import com.denisitch.customer.entity.FavouriteProduct;
 import com.denisitch.customer.repository.FavouriteProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -24,7 +25,13 @@ public class DefaultFavouriteProductsServiceI implements FavouriteProductsServic
         return this.favouriteProductRepository.deleteByProductId(productId);
     }
 
+    @Override
     public Mono<FavouriteProduct> findFavouriteProductByProduct(int productId) {
         return this.favouriteProductRepository.findByProductId(productId);
+    }
+
+    @Override
+    public Flux<FavouriteProduct> findFavouriteProducts() {
+        return this.favouriteProductRepository.findAll();
     }
 }
