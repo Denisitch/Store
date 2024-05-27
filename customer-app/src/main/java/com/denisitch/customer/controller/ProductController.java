@@ -2,7 +2,7 @@ package com.denisitch.customer.controller;
 
 import com.denisitch.customer.client.ProductsClient;
 import com.denisitch.customer.entity.Product;
-import com.denisitch.customer.payload.NewProductReviewPayload;
+import com.denisitch.customer.controller.payload.NewProductReviewPayload;
 import com.denisitch.customer.service.FavouriteProductsService;
 import com.denisitch.customer.service.ProductReviewsService;
 import jakarta.validation.Valid;
@@ -13,6 +13,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import java.util.NoSuchElementException;
 
 @Controller
 @RequiredArgsConstructor
@@ -27,7 +29,8 @@ public class ProductController {
 
     @ModelAttribute(name = "product", binding = false)
     public Mono<Product> loadProduct(@PathVariable("productId") int productId) {
-        return this.productsClient.findProduct(productId);
+        return this.productsClient.findProduct(productId)
+                .switchIfEmpty(Mono.error(new NoSuchElementException("customer.products.error.not_found")));
     }
 
     @GetMapping
@@ -80,5 +83,11 @@ public class ProductController {
             return this.productReviewsService.createProductReview(id, payload.rating(), payload.review())
                     .thenReturn("redirect:/customer/products/%d".formatted(id));
         }
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public String handleNoSuchElementException(NoSuchElementException ex, Model model) {
+        model.addAttribute("error", ex.getMessage());
+        return "errors/404";
     }
 }

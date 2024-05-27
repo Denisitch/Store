@@ -1,4 +1,4 @@
-package com.denisitch.customer.payload;
+package com.denisitch.customer.controller.payload;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

@@ -3,6 +3,7 @@ package com.denisitch.customer.client;
 import com.denisitch.customer.entity.Product;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -24,6 +25,7 @@ public class WebClientProductsClient implements ProductsClient {
         return this.webClient.get()
                 .uri("/catalogue-api/products/{productId}", productId)
                 .retrieve()
-                .bodyToMono(Product.class);
+                .bodyToMono(Product.class)
+                .onErrorComplete(WebClientResponseException.NotFound.class);
     }
 }
