@@ -1,5 +1,7 @@
 package com.denisitch.customer.config;
 
+import com.denisitch.customer.client.WebClientFavouriteProductsClient;
+import com.denisitch.customer.client.WebClientProductReviewsClient;
 import com.denisitch.customer.client.WebClientProductsClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +17,24 @@ public class ClientConfig {
     ) {
         return new WebClientProductsClient(WebClient.builder()
                 .baseUrl(catalogueBaseUrl)
+                .build());
+    }
+
+    @Bean
+    public WebClientFavouriteProductsClient webClientFavouriteProductsClient(
+            @Value("${store.services.feedback.uri:http://localhost:8084}") String feedbackBaseUrl
+    ) {
+        return new WebClientFavouriteProductsClient(WebClient.builder()
+                .baseUrl(feedbackBaseUrl)
+                .build());
+    }
+
+    @Bean
+    public WebClientProductReviewsClient webClientProductReviewsClient(
+            @Value("${store.services.feedback.uri:http://localhost:8084}") String feedbackBaseUrl
+    ) {
+        return new WebClientProductReviewsClient(WebClient.builder()
+                .baseUrl(feedbackBaseUrl)
                 .build());
     }
 }

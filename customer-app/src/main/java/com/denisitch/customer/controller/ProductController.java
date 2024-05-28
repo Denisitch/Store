@@ -3,13 +3,13 @@ package com.denisitch.customer.controller;
 import com.denisitch.customer.client.FavouriteProductsClient;
 import com.denisitch.customer.client.ProductReviewsClient;
 import com.denisitch.customer.client.ProductsClient;
+import com.denisitch.customer.client.exception.ClientBadRequestException;
 import com.denisitch.customer.entity.Product;
 import com.denisitch.customer.controller.payload.NewProductReviewPayload;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -17,6 +17,7 @@ import java.util.NoSuchElementException;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("customer/products/{productId:\\d+}")
 public class ProductController {
 
@@ -51,7 +52,11 @@ public class ProductController {
         return productMono
                 .map(Product::id)
                 .flatMap(productId -> this.favouriteProductsClient.addProductToFavourites(productId)
-                        .thenReturn("redirect:/customer/products/%d".formatted(productId)));
+                        .thenReturn("redirect:/customer/products/%d".formatted(productId))
+                        .onErrorResume(exception -> {
+                            log.error(exception.getMessage(), exception);
+                            return Mono.just("redirect:/customer/products/%d".formatted(productId));
+                        }));
     }
 
     @PostMapping("remove-from-favourites")
@@ -66,22 +71,19 @@ public class ProductController {
     public Mono<String> createReview(
             @PathVariable("productId") int id,
             NewProductReviewPayload payload,
-            BindingResult bindingResult,
             Model model
     ) {
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("inFavourite", false);
-            model.addAttribute("payload", payload);
-            model.addAttribute("errors", bindingResult.getAllErrors().stream()
-                    .map(ObjectError::getDefaultMessage)
-                    .toList());
-            return this.favouriteProductsClient.findFavouriteProductByProductId(id)
-                    .doOnNext(_ -> model.addAttribute("inFavourite", true))
-                    .thenReturn("customer/products/product");
-        } else {
-            return this.productReviewsClient.createProductReview(id, payload.rating(), payload.review())
-                    .thenReturn("redirect:/customer/products/%d".formatted(id));
-        }
+        return this.productReviewsClient.createProductReview(id, payload.rating(), payload.review())
+                .thenReturn("redirect:/customer/products/%d".formatted(id))
+                .onErrorResume(ClientBadRequestException.class,
+                        e -> {
+                            model.addAttribute("inFavourite", false);
+                            model.addAttribute("payload", payload);
+                            model.addAttribute("errors", e.getErrors());
+                            return this.favouriteProductsClient.findFavouriteProductByProductId(id)
+                                    .doOnNext(_ -> model.addAttribute("inFavourite", true))
+                                    .thenReturn("customer/products/product");
+                        });
     }
 
     @ExceptionHandler(NoSuchElementException.class)

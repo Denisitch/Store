@@ -30,9 +30,9 @@ public class ProductReviewsRestController {
     ) {
         return payloadMono
                 .flatMap(payload -> this.productReviewsService.createProductReview(payload.productId(),
-                        payload.rating(), payload.reviews()))
+                        payload.rating(), payload.review()))
                 .map(productReview -> ResponseEntity
-                        .created(uriComponentsBuilder.replacePath("/feedback-api/product-reviews/{id}")
+                        .created(uriComponentsBuilder.replacePath("/feedback-api/product-review/{id}")
                                 .build(productReview.getId()))
                         .body(productReview));
     }
