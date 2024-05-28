@@ -1,17 +1,23 @@
 package com.denisitch.customer.client;
 
 import com.denisitch.customer.entity.FavouriteProduct;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public class WebClientFavouriteProductsClientI implements FavouriteProductsClient {
+@RequiredArgsConstructor
+public class WebClientFavouriteProductsClient implements FavouriteProductsClient {
+
+    private final WebClient webClient;
+
     @Override
     public Flux<FavouriteProduct> findFavouriteProducts() {
         return null;
     }
 
     @Override
-    public Flux<FavouriteProduct> findFavouriteProductByProductId(int productId) {
+    public Mono<FavouriteProduct> findFavouriteProductByProductId(int productId) {
         return null;
     }
 
