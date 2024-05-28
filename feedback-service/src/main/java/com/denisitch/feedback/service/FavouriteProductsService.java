@@ -1,6 +1,6 @@
-package com.denisitch.customer.service;
+package com.denisitch.feedback.service;
 
-import com.denisitch.customer.entity.FavouriteProduct;
+import com.denisitch.feedback.entity.FavouriteProduct;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

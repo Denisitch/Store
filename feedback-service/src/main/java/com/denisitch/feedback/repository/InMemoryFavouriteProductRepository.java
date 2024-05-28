@@ -1,6 +1,6 @@
-package com.denisitch.customer.repository;
+package com.denisitch.feedback.repository;
 
-import com.denisitch.customer.entity.FavouriteProduct;
+import com.denisitch.feedback.entity.FavouriteProduct;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

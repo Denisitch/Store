@@ -1,7 +1,7 @@
-package com.denisitch.customer.service;
+package com.denisitch.feedback.service;
 
-import com.denisitch.customer.entity.ProductReview;
-import com.denisitch.customer.repository.ProductReviewRepository;
+import com.denisitch.feedback.entity.ProductReview;
+import com.denisitch.feedback.repository.ProductReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
