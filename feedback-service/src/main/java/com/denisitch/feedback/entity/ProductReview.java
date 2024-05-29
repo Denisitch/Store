@@ -22,4 +22,6 @@ public class ProductReview {
     private int rating;
 
     private String review;
+
+    String userId;
 }
