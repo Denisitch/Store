@@ -25,7 +25,7 @@ class ProductRepositoryIT {
     void findAllByTitleLikeIgnoreCase_ReturnsFilteredProductsList() {
         var filter = "%портвейн%";
 
-        var products = this.productRepository.findByTitleLikeIgnoreCase(filter);
+        var products = this.productRepository.findAllByTitleLikeIgnoreCase(filter);
 
         assertEquals(List.of(new Product(4, "Портвейн", "777")), products);
     }

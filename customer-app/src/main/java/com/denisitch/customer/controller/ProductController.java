@@ -35,21 +35,25 @@ public class ProductController {
     @ModelAttribute(name = "product", binding = false)
     public Mono<Product> loadProduct(@PathVariable("productId") int productId) {
         return this.productsClient.findProduct(productId)
-                .switchIfEmpty(Mono.error(new NoSuchElementException("customer.products.error.not_found")));
+                .switchIfEmpty(Mono.defer(
+                        () -> Mono.error(new NoSuchElementException("customer.products.error.not_found"))
+                ));
     }
 
     @GetMapping
     public Mono<String> getProductPage(
-            @PathVariable("productId") int id,
+            @ModelAttribute("product") Mono<Product> productMono,
             Model model
     ) {
         model.addAttribute("inFavourite", false);
-        return this.productReviewsClient.findProductReviewsByProductId(id)
-                .collectList()
-                .doOnNext(productReviews -> model.addAttribute("reviews", productReviews))
-                .then(this.favouriteProductsClient.findFavouriteProductByProductId(id)
-                        .doOnNext(_ -> model.addAttribute("inFavourite", true)))
-                .thenReturn("customer/products/product");
+        return productMono.flatMap(
+                product -> this.productReviewsClient.findProductReviewsByProductId(product.id())
+                        .collectList()
+                        .doOnNext(productReviews -> model.addAttribute("reviews", productReviews))
+                        .then(this.favouriteProductsClient.findFavouriteProductByProductId(product.id())
+                                .doOnNext(_ -> model.addAttribute("inFavourite", true)))
+                        .thenReturn("customer/products/product")
+        );
     }
 
     @PostMapping("add-to-favourites")
@@ -73,22 +77,22 @@ public class ProductController {
     }
 
     @PostMapping("create-review")
-    public Mono<String> createReview(
-            @PathVariable("productId") int id,
-            NewProductReviewPayload payload,
-            Model model
-    ) {
-        return this.productReviewsClient.createProductReview(id, payload.rating(), payload.review())
-                .thenReturn("redirect:/customer/products/%d".formatted(id))
-                .onErrorResume(ClientBadRequestException.class,
-                        e -> {
+    public Mono<String> createReview(@ModelAttribute("product") Mono<Product> productMono,
+                                     NewProductReviewPayload payload,
+                                     Model model,
+                                     ServerHttpResponse response) {
+        return productMono.flatMap(product ->
+                this.productReviewsClient.createProductReview(product.id(), payload.rating(), payload.review())
+                        .thenReturn("redirect:/customer/products/%d".formatted(product.id()))
+                        .onErrorResume(ClientBadRequestException.class, exception -> {
                             model.addAttribute("inFavourite", false);
                             model.addAttribute("payload", payload);
-                            model.addAttribute("errors", e.getErrors());
-                            return this.favouriteProductsClient.findFavouriteProductByProductId(id)
+                            model.addAttribute("errors", exception.getErrors());
+                            response.setStatusCode(HttpStatus.BAD_REQUEST);
+                            return this.favouriteProductsClient.findFavouriteProductByProductId(product.id())
                                     .doOnNext(_ -> model.addAttribute("inFavourite", true))
                                     .thenReturn("customer/products/product");
-                        });
+                        }));
     }
 
     @ExceptionHandler(NoSuchElementException.class)

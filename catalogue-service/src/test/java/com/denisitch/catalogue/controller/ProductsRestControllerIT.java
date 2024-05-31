@@ -49,6 +49,23 @@ class ProductsRestControllerIT {
     }
 
     @Test
+    @Sql("/sql/products.sql")
+    void findProducts_UserIsNotAuthorized_ReturnsForbidden() throws Exception {
+        // given
+        var requestBuilder = MockMvcRequestBuilders.get("/catalogue-api/products")
+                .param("filter", "товар")
+                .with(jwt());
+
+        // when
+        this.mockMvc.perform(requestBuilder)
+                // then
+                .andDo(print())
+                .andExpectAll(
+                        status().isForbidden()
+                );
+    }
+
+    @Test
     void createProduct_RequestIsValid_ReturnsCreatedProduct() throws Exception {
         var requestBuilder = MockMvcRequestBuilders.post("/catalogue-api/products")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -90,6 +107,7 @@ class ProductsRestControllerIT {
                         content().json("""
                                 {
                                   "errors": [
+                                    "Название товара должно быть указано",
                                     "Название товара должно быть от 3 до 50 символов"
                                   ]
                                 }
