@@ -4,6 +4,8 @@ import com.denisitch.customer.client.exception.ClientBadRequestException;
 import com.denisitch.customer.client.payload.NewFavouriteProductPayload;
 import com.denisitch.customer.entity.FavouriteProduct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -12,6 +14,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
+
+@Slf4j
 @RequiredArgsConstructor
 public class WebClientFavouriteProductsClient implements FavouriteProductsClient {
 
@@ -38,15 +43,17 @@ public class WebClientFavouriteProductsClient implements FavouriteProductsClient
 
     @Override
     public Mono<FavouriteProduct> addProductToFavourites(int productId) {
+        log.info("Adding product to favourites: {}", productId);
         return webClient
                 .post()
                 .uri("/feedback-api/favourite-products")
+                .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new NewFavouriteProductPayload(productId))
                 .retrieve()
                 .bodyToMono(FavouriteProduct.class)
                 .onErrorMap(WebClientResponseException.BadRequest.class,
-                        exception -> new ClientBadRequestException(exception,
-                                (List<String>) exception.getResponseBodyAs(ProblemDetail.class)
+                        exception -> new ClientBadRequestException("Возникла ошибка при добавление товара в избранные",
+                                exception, (List<String>) exception.getResponseBodyAs(ProblemDetail.class)
                                         .getProperties().get("errors")));
     }
 
