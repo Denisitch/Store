@@ -90,7 +90,7 @@ public class ProductController {
                             model.addAttribute("errors", exception.getErrors());
                             response.setStatusCode(HttpStatus.BAD_REQUEST);
                             return this.favouriteProductsClient.findFavouriteProductByProductId(product.id())
-                                    .doOnNext(favouriteProduct -> model.addAttribute("inFavourite", true))
+                                    .doOnNext(_ -> model.addAttribute("inFavourite", true))
                                     .thenReturn("customer/products/product");
                         }));
     }

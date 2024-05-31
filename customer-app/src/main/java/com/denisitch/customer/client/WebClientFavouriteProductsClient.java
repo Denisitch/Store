@@ -14,8 +14,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
-
 @Slf4j
 @RequiredArgsConstructor
 public class WebClientFavouriteProductsClient implements FavouriteProductsClient {
