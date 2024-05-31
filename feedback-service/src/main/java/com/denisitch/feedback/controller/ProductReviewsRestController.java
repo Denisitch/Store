@@ -20,7 +20,7 @@ public class ProductReviewsRestController {
     private final ProductReviewsService productReviewsService;
 
     @GetMapping("by-product-id/{productId:\\d+}")
-    public Flux<ProductReview> findByProductReviewsByProductId(@PathVariable("productId") int productId) {
+    public Flux<ProductReview> findProductReviewsByProductId(@PathVariable("productId") int productId) {
         return this.productReviewsService.findProductReviewsByProduct(productId);
     }
 
@@ -34,7 +34,7 @@ public class ProductReviewsRestController {
                 .flatMap(payload -> this.productReviewsService.createProductReview(payload.productId(),
                         payload.rating(), payload.review(), token.getToken().getSubject())))
                 .map(productReview -> ResponseEntity
-                        .created(uriComponentsBuilder.replacePath("/feedback-api/product-review/{id}")
+                        .created(uriComponentsBuilder.replacePath("/feedback-api/product-reviews/{id}")
                                 .build(productReview.getId()))
                         .body(productReview));
     }

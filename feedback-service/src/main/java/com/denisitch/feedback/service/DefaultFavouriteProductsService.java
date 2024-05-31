@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class DefaultFavouriteProductsServiceI implements FavouriteProductsService {
+public class DefaultFavouriteProductsService implements FavouriteProductsService {
 
     private final FavouriteProductRepository favouriteProductRepository;
 

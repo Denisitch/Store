@@ -26,7 +26,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 class ProductReviewsRestControllerIT {
 
     @Autowired
-    WebTestClient webTestClientClient;
+    WebTestClient webTestClient;
 
     @Autowired
     ReactiveMongoTemplate reactiveMongoTemplate;
@@ -53,7 +53,7 @@ class ProductReviewsRestControllerIT {
 
     @Test
     void findProductReviewsByProductId_ReturnsReviews() {
-        this.webTestClientClient
+        this.webTestClient
                 .mutateWith(mockJwt())
                 .mutate().filter(ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
                     log.info("========== REQUEST ==========");
@@ -82,7 +82,7 @@ class ProductReviewsRestControllerIT {
 
     @Test
     void findProductReviewsByProductId_UserIsNotAuthenticated_ReturnsNotAuthorized() {
-        this.webTestClientClient
+        this.webTestClient
                 .get()
                 .uri("/feedback-api/product-reviews/by-product-id/1")
                 .exchange()
@@ -91,7 +91,7 @@ class ProductReviewsRestControllerIT {
 
     @Test
     void createProductReview_RequestIsValid_ReturnsProductReview() {
-        this.webTestClientClient
+        this.webTestClient
                 .mutateWith(mockJwt().jwt(builder -> builder.subject("user-tester")))
                 .post()
                 .uri("/feedback-api/product-reviews")
@@ -122,7 +122,7 @@ class ProductReviewsRestControllerIT {
 
     @Test
     void createProductReview_RequestIsInvalid_ReturnsBadRequest() {
-        this.webTestClientClient
+        this.webTestClient
                 .mutateWith(mockJwt().jwt(builder -> builder.subject("user-tester")))
                 .post()
                 .uri("/feedback-api/product-reviews")
@@ -148,5 +148,25 @@ class ProductReviewsRestControllerIT {
                           ]
                         }
                         """);
+    }
+
+    @Test
+    void createProductReview_UserIsNotAuthenticated_ReturnsNotAuthorized() {
+        // given
+
+        // when
+        this.webTestClient
+                .post()
+                .uri("/feedback-api/product-reviews")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "productId": 1,
+                            "rating": 5,
+                            "review": "Эта пять"
+                        }""")
+                .exchange()
+                // then
+                .expectStatus().isUnauthorized();
     }
 }
