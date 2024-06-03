@@ -3,6 +3,9 @@ server:
 spring:
   security:
     oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8082/realms/store
       client:
         provider:
           keycloak:
@@ -12,5 +15,12 @@ spring:
             authorization-grant-type: client_credentials
             scope:
               - metrics
+            client-id: admin-service
+            client-secret: 4mR9OIt3qadt22Dbbr5KC01lsRQ0qVcg
+          login:
+            provider: keycloak
+            scope:
+              - metrics
+              - openid
             client-id: admin-service
             client-secret: 4mR9OIt3qadt22Dbbr5KC01lsRQ0qVcg

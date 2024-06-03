@@ -1,4 +1,4 @@
-package com.denisitch.admin.web;
+package com.denisitch.admin.web.client;
 
 import de.codecentric.boot.admin.server.domain.entities.Instance;
 import de.codecentric.boot.admin.server.web.client.HttpHeadersProvider;
