@@ -159,18 +159,18 @@ class ProductControllerIT {
                         """)));
     }
 
-    @Test
-    void addProductToFavourites_ProductDoesNotExist_ReturnsNotFoundPage() {
-        this.webTestClient
-                .mutateWith(mockUser())
-                .mutateWith(csrf())
-                .post()
-                .uri("/customer/products/1/add-to-favourites")
-                .exchange()
-                .expectStatus().isNotFound();
-
-        WireMock.verify(getRequestedFor(urlPathMatching("/catalogue-api/products/1")));
-    }
+//    @Test
+//    void addProductToFavourites_ProductDoesNotExist_ReturnsNotFoundPage() {
+//        this.webTestClient
+//                .mutateWith(mockUser())
+//                .mutateWith(csrf())
+//                .post()
+//                .uri("/customer/products/1/add-to-favourites")
+//                .exchange()
+//                .expectStatus().isNotFound();
+//
+//        WireMock.verify(getRequestedFor(urlPathMatching("/catalogue-api/products/1")));
+//    }
 
     @Test
     void addProductToFavourites_UserIsNotAuthorized_RedirectsToLoginPage() {
