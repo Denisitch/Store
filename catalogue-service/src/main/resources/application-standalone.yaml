@@ -1,4 +1,12 @@
 spring:
+  boot:
+    admin:
+      client:
+        enabled: true
+        instance:
+          name: catalogue-service
+          service-host-type: ip
+        url: http://localhost:8085
   datasource:
     url: jdbc:postgresql://localhost:5432/catalogue
     username: catalogue
