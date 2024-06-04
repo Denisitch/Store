@@ -1,0 +1,71 @@
+scrape_configs:
+  - job_name: store_admin_service
+    static_configs:
+      - targets: ["http://172.17.0.1:8085"]
+        labels:
+          application: store-admin-service
+    metrics_path: /actuator/prometheus
+    oauth2:
+      client_id: victoria-metrics
+      client_secret: tXGda7uJNj0PF41qcIMhHPx9B1lutSXk
+      token_url: http://172.17.0.1:8082/realms/store/protocol/openid-connect/token
+      scopes:
+        - metrics
+      endpoint_params:
+        grant_type: client_credentials
+#  - job_name: store_catalogue_service
+#    static_configs:
+#      - targets: ["http://172.17.0.1:8081"]
+#        labels:
+#          application: store-catalogue-service
+#    metrics_path: /actuator/prometheus
+#    oauth2:
+#      client_id: victoria-metrics
+#      client_secret: tXGda7uJNj0PF41qcIMhHPx9B1lutSXk
+#      token_url: http://172.17.0.1:8082/realms/store/protocol/openid-connect/token
+#      scopes:
+#        - metrics
+#      endpoint_params:
+#        grant_type: client_credentials
+#  - job_name: store_feedback_service
+#    static_configs:
+#      - targets: ["http://172.17.0.1:8084"]
+#        labels:
+#          application: store-feedback-service
+#    metrics_path: /actuator/prometheus
+#    oauth2:
+#      client_id: victoria-metrics
+#      client_secret: tXGda7uJNj0PF41qcIMhHPx9B1lutSXk
+#      token_url: http://172.17.0.1:8082/realms/store/protocol/openid-connect/token
+#      scopes:
+#        - metrics
+#      endpoint_params:
+#        grant_type: client_credentials
+#  - job_name: store_customer_app
+#    static_configs:
+#      - targets: ["http://172.17.0.1:8083"]
+#        labels:
+#          application: store-customer-app
+#    metrics_path: /actuator/prometheus
+#    oauth2:
+#      client_id: victoria-metrics
+#      client_secret: tXGda7uJNj0PF41qcIMhHPx9B1lutSXk
+#      token_url: http://172.17.0.1:8082/realms/store/protocol/openid-connect/token
+#      scopes:
+#        - metrics
+#      endpoint_params:
+#        grant_type: client_credentials
+#  - job_name: store_manager_app
+#    static_configs:
+#      - targets: ["http://172.17.0.1:8080"]
+#        labels:
+#          application: store-manager-app
+#    metrics_path: /actuator/prometheus
+#    oauth2:
+#      client_id: victoria-metrics
+#      client_secret: tXGda7uJNj0PF41qcIMhHPx9B1lutSXk
+#      token_url: http://172.17.0.1:8082/realms/store/protocol/openid-connect/token
+#      scopes:
+#        - metrics
+#      endpoint_params:
+#        grant_type: client_credentials

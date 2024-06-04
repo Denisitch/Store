@@ -46,7 +46,7 @@ public class SecurityBeans {
                         authorizationManagerRequestMatcherRegistry
                                 .requestMatchers("/instances", "/instances/*")
                                 .hasAuthority("SCOPE_metrics_server")
-                                .requestMatchers("/actuator/**").permitAll()
+                                .requestMatchers("/actuator/**").hasAuthority("SCOPE_metrics")
                                 .anyRequest().denyAll())
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
