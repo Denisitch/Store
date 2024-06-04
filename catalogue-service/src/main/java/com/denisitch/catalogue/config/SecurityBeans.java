@@ -24,6 +24,7 @@ public class SecurityBeans {
                                 .hasAuthority("SCOPE_edit_catalogue")
                                 .requestMatchers(HttpMethod.DELETE, "/catalogue-api/products/{productId:\\d}")
                                 .hasAuthority("SCOPE_edit_catalogue")
+                                .requestMatchers("/actuator/**").hasAuthority("SCOPE_metrics")
                                 .requestMatchers(HttpMethod.GET)
                                 .hasAuthority("SCOPE_view_catalogue")
                                 .anyRequest().denyAll())
@@ -32,6 +33,7 @@ public class SecurityBeans {
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(httpSecurityOAuth2ResourceServerConfigurer ->
                         httpSecurityOAuth2ResourceServerConfigurer.jwt(Customizer.withDefaults()))
+                .oauth2Client(Customizer.withDefaults())
                 .build();
     }
 }
